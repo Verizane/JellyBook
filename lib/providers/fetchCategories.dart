@@ -1,5 +1,6 @@
 // The purpose of this file is to fetch the categories from the database
 
+import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tentacle/tentacle.dart';
 import 'package:jellybook/providers/fetchBooks.dart';
@@ -31,7 +32,7 @@ Future<(List<Entry>, List<Folder>)> getServerCategories({
   final isar = Isar.getInstance();
   final List<Folder> foldersTemp = await isar!.folders.where().findAll();
   QueryBuilder<Entry, Entry, QAfterFilterCondition> typeNotBook =
-      await isar.entrys.filter().not().typeEqualTo(EntryType.folder);
+      isar.entrys.filter().not().typeEqualTo(EntryType.folder);
   List<Entry> booksTemp =
       await typeNotBook.and().isFavoritedEqualTo(true).sortByTitle().findAll();
   booksTemp.addAll(await typeNotBook
@@ -39,7 +40,7 @@ Future<(List<Entry>, List<Folder>)> getServerCategories({
       .isFavoritedEqualTo(false)
       .sortByTitle()
       .findAll());
-  if (foldersTemp.length > 0 && booksTemp.length > 0 && !force) {
+  if (foldersTemp.isNotEmpty && booksTemp.isNotEmpty && !force) {
     return (booksTemp, foldersTemp);
   }
 
@@ -51,14 +52,14 @@ Future<(List<Entry>, List<Folder>)> getServerCategories({
   Map<String, String> headers =
       getHeaders(url, client, device, deviceId, version, token);
   final api = Tentacle(basePathOverride: url).getUserViewsApi();
-  var response;
+  Response<BaseItemDtoQueryResult> response = Response(requestOptions: RequestOptions());
   try {
     response = await api.getUserViews(
       userId: userId,
       headers: headers,
       includeHidden: true,
     );
-    // logger.d(response);
+    // logger.d("response: $response");
   } catch (e, s) {
     bool useSentry = prefs.getBool('useSentry') ?? false;
     if (useSentry) await Sentry.captureException(e, stackTrace: s);
@@ -66,9 +67,24 @@ Future<(List<Entry>, List<Folder>)> getServerCategories({
   }
 
   logger.d("got response");
-  logger.d(response?.statusCode.toString());
-  final data = response.data.items
-      .where((element) => element.collectionType == 'books')
+  logger.d(response.statusCode.toString());
+  if (response.data == null) {
+    logger.e("response contains no data");
+    List<Entry> e = [];
+    List<Folder> f =[];
+    return (e, f);
+  } else if (response.data != null) {
+    if (response.data!.items == null) {
+      logger.e("response contains no items");
+      List<Entry> e = [];
+      List<Folder> f =[];
+
+      return (e, f);
+    }
+  }
+
+  final data = response.data!.items!
+      .where((element) => element.collectionType.toString() == 'books')
       .toList();
 
   bool hasComics = true;
@@ -78,16 +94,25 @@ Future<(List<Entry>, List<Folder>)> getServerCategories({
     List<String> categories = [];
     // add all data['Items'] to categories
     data.forEach((element) {
-      categories.add(element.name);
+      String name = "";
+      if (element.name != null) {
+        name = element.name!;
+      }
+      categories.add(name);
     });
 
     List<Entry> comics = [];
     List<String> comicsIds = [];
-    logger.d("selected: " + categories.toString());
+    logger.d("selected: ${categories.toString()}");
     data.forEach((element) {
-      comicsId = element.id;
+      String id = "";
+      if (element.id != null) {
+        id = element.id!;
+      }
+      
+      comicsId = id;
       comicsIds.add(comicsId);
-      etag = element.etag;
+      // etag = element.etag;
       // comicsArray.add(getComics(comicsId, etag));
     });
     for (int i = 0; i < comicsIds.length; i++) {
@@ -114,15 +139,20 @@ Future<(List<Entry>, List<Folder>)> getServerCategories({
     likedComics.sort((a, b) => a.title.compareTo(b.title));
     unlikedComics.sort((a, b) => a.title.compareTo(b.title));
 
-    logger.d("likedComics: " + likedComics.length.toString());
-    logger.d("unlikedComics: " + unlikedComics.length.toString());
+    logger.d("likedComics: ${likedComics.length.toString()}");
+    logger.d("unlikedComics: ${unlikedComics.length.toString()}");
     comics = likedComics + unlikedComics;
-    logger.d("comics: " + comics.length.toString());
+    logger.d("comics: ${comics.length.toString()}");
 
     // final isar = Isar.getInstance();
     List<String> categoriesList = [];
     for (int i = 0; i < data.length; i++) {
-      categoriesList.add(data[i].name);
+      var element = data[i];
+      String name = "";
+      if (element.name != null) {
+        name = element.name!;
+      }
+      categoriesList.add(name);
     }
     logger.i("categoriesList: $categoriesList");
     prefs.setStringList('categories', categoriesList);
@@ -156,7 +186,7 @@ Future<(int, List<Entry>)> fetchEntries(int offset, int limit) async {
       .findAll());
   entries = entries.skip(offset).take(limit).toList();
   int length = entries.length;
-  logger.f("entries: " + entries.length.toString());
+  logger.f("entries: ${entries.length.toString()}");
   return (length, entries);
 }
 
@@ -166,9 +196,9 @@ Future<List<Map<String, dynamic>>> compareFolders(
 ) async {
   logger.d("comparing folders");
   List<Map<String, dynamic>> newFolders = [];
-  logger.d("folders: " + folders.length.toString());
+  logger.d("folders: ${folders.length.toString()}");
   for (int i = 0; i < folders.length; i++) {
-    logger.d("folder: " + folders[i]['name']);
+    logger.d("folder: ${folders[i]['name']}");
     bool isSubfolder = false;
     for (int j = 0; j < folders.length; j++) {
       if (i != j) {
@@ -181,7 +211,7 @@ Future<List<Map<String, dynamic>>> compareFolders(
       newFolders.add(folders[i]);
     }
   }
-  logger.d("newFolders: " + newFolders.length.toString());
+  logger.d("newFolders: ${newFolders.length.toString()}");
   return newFolders;
 }
 

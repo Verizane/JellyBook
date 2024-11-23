@@ -4,9 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 // import 'package:epub_view_enhanced/epub_view_enhanced.dart';
 import 'package:jellybook_epub_view/jellybook_epub_view.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:isar/isar.dart';
-import 'package:isar_flutter_libs/isar_flutter_libs.dart';
 import 'package:jellybook/models/entry.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:jellybook/variables.dart';
@@ -23,14 +21,20 @@ class EpubReader extends StatefulWidget {
     required this.title,
     required this.comicId,
   });
-
-  _EpubReaderState createState() => _EpubReaderState(
+  
+  EpubReaderState _generateState() {
+    return EpubReaderState(
         title: title,
         comicId: comicId,
       );
+  }
+
+  @override
+  EpubReaderState createState() => _generateState();
+  
 }
 
-class _EpubReaderState extends State<EpubReader> {
+class EpubReaderState extends State<EpubReader> {
   final String title;
   final String comicId;
 
@@ -48,7 +52,7 @@ class _EpubReaderState extends State<EpubReader> {
   Duration audioPosition = const Duration();
   String audioId = '';
 
-  _EpubReaderState({
+  EpubReaderState({
     required this.title,
     required this.comicId,
   });
@@ -285,7 +289,7 @@ class _EpubReaderState extends State<EpubReader> {
                   controller: _epubController,
                 ),
               ),
-              body: EpubView(
+              body: JellybookEpubView(
                 (url) {
                   logger.d("External link pressed: $url");
                   // open url in browser

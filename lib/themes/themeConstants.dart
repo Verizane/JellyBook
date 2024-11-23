@@ -37,7 +37,7 @@ ThemeData oled = ThemeData(
     ),
     color: Colors.grey[800],
   ),
-  textTheme: TextTheme(
+  textTheme: const TextTheme(
     headline1: TextStyle(
       color: Colors.white,
       fontSize: 24,

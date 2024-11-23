@@ -233,9 +233,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   // theme settings (future builder to get the current theme and then change it)
   Future<Widget> themeSettings(BuildContext context) async {
+    String theme = "";
+    if (prefs != null) {
+      if (prefs!.getString('theme') != null) {
+        theme = prefs!.getString('theme')!;
+      }
+    }
+    
     return SettingsItem(
       title: AppLocalizations.of(context)?.theme ?? 'theme',
-      selected: await prefs!.getString('theme') ?? 'system',
+      selected: theme == "" ? 'system' : theme,
       backgroundColor: Theme.of(context).splashColor,
       icon: Icons.color_lens,
       values: <String, String>{
@@ -524,6 +531,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     "pl": {"name": "Polish", "nativeName": "polski"},
     "ps": {"name": "Pashto, Pushto", "nativeName": "پښتو"},
     "pt": {"name": "Portuguese", "nativeName": "Português"},
+    "pt_BR": {"name": "pt_BR", "nativeName": "pt_BR"},
     "qu": {"name": "Quechua", "nativeName": "Runa Simi, Kichwa"},
     "rm": {"name": "Romansh", "nativeName": "rumantsch grischun"},
     "rn": {"name": "Kirundi", "nativeName": "kiRundi"},
@@ -589,6 +597,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     Map<String, String> locales = {};
     // add the locales to the map
     for (var locale in AppLocalizations.supportedLocales) {
+      logger.w(locale.toString());
       locales.addAll({
         locale.toString():
             // get the language name (ex. English) from isoLangs map
