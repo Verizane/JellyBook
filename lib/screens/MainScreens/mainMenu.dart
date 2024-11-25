@@ -7,12 +7,9 @@ import 'package:jellybook/screens/infoScreen.dart';
 import 'package:jellybook/screens/loginScreen.dart';
 import 'package:jellybook/screens/MainScreens/searchScreen.dart';
 import 'package:jellybook/models/login.dart';
-import 'package:jellybook/screens/offlineBookReader.dart';
 import 'package:isar/isar.dart';
-import 'package:isar_flutter_libs/isar_flutter_libs.dart';
 import 'package:jellybook/models/entry.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:fancy_shimmer_image/fancy_shimmer_image.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:jellybook/variables.dart';
 import 'package:jellybook/widgets/roundedImageWithShadow.dart';
@@ -21,26 +18,28 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MainMenu extends StatefulWidget {
+  const MainMenu({super.key});
+
   @override
-  _MainMenuState createState() => _MainMenuState();
+  MainMenuState createState() => MainMenuState();
 }
 
-class _MainMenuState extends State<MainMenu> {
+class MainMenuState extends State<MainMenu> {
   /*
-           Heres what this should look like:
-           - should be a grid view of cards
-           - each comic should have its own card
-           - the cards should have:
-                - a photo
-                - the title
-                - the release data if known
-                - a more info button
-                - a progress bar if book has been started
-           - At the bottom will be a bar witch will contain the following sections:
-                - a library section
-                - a search section
-                - a settings section
-        */
+      Heres what this should look like:
+      - should be a grid view of cards
+      - each comic should have its own card
+      - the cards should have:
+          - a photo
+          - the title
+          - the release data if known
+          - a more info button
+          - a progress bar if book has been started
+      - At the bottom will be a bar witch will contain the following sections:
+          - a library section
+          - a search section
+          - a settings section
+  */
   static const _pageSize = 20;
   final PagingController<int, Entry> _pagingController =
       PagingController(firstPageKey: 0);
@@ -194,7 +193,7 @@ class _MainMenuState extends State<MainMenu> {
                 ),
                 const SizedBox(width: 10),
                 Text(
-                  (AppLocalizations.of(context)?.search ?? 'Search') + '…',
+                  "${AppLocalizations.of(context)?.search ?? 'Search'}…",
                   style: TextStyle(
                     color: Theme.of(context).secondaryHeaderColor,
                     fontSize: 17,
@@ -420,7 +419,7 @@ class _MainMenuState extends State<MainMenu> {
 class GridEntryWidget extends StatefulWidget {
   final Entry entry;
 
-  const GridEntryWidget(this.entry);
+  const GridEntryWidget(this.entry, {super.key});
 
   // createState function
   @override
@@ -461,7 +460,9 @@ class GridEntryWidgetState extends State<GridEntryWidget> {
                   // height should be 80% of the card
                   height: MediaQuery.of(context).size.height / 6 * 0.8,
                   child: RoundedImageWithShadow(
-                    imageUrl: widget.entry.imagePath ?? 'Asset',
+                    // imagePath is never null.
+                    // imageUrl: widget.entry.imagePath ?? 'Asset',
+                    imageUrl: widget.entry.imagePath,
                   ),
                 ),
                 if (widget.entry.isFavorited == true)

@@ -4,22 +4,21 @@ import 'package:flutter/material.dart';
 import 'package:jellybook/screens/collectionScreen.dart';
 import 'package:jellybook/screens/infoScreen.dart';
 import 'package:isar/isar.dart';
-import 'package:isar_flutter_libs/isar_flutter_libs.dart';
 import 'package:jellybook/models/entry.dart';
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:jellybook/widgets/roundedImageWithShadow.dart';
 import 'package:jellybook/providers/fixRichText.dart';
 import 'package:flutter_star/flutter_star.dart';
-import 'package:fancy_shimmer_image/fancy_shimmer_image.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:jellybook/variables.dart';
 
 class DownloadsScreen extends StatefulWidget {
+  const DownloadsScreen({super.key});
+
   @override
-  _DownloadsScreenState createState() => _DownloadsScreenState();
+  DownloadsScreenState createState() => DownloadsScreenState();
 }
 
-class _DownloadsScreenState extends State<DownloadsScreen> {
+class DownloadsScreenState extends State<DownloadsScreen> {
   Future<List<Entry>> getEntries() async {
     final isar = Isar.getInstance();
     final entryList =

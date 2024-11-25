@@ -5,7 +5,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:jellybook/widgets/WaveProgressBar.dart';
 import 'dart:async';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:path_provider/path_provider.dart';
@@ -20,7 +19,6 @@ import 'package:tentacle/tentacle.dart';
 // import the database
 import 'package:jellybook/models/entry.dart';
 import 'package:isar/isar.dart';
-import 'package:isar_flutter_libs/isar_flutter_libs.dart';
 
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:jellybook/variables.dart';
@@ -28,23 +26,24 @@ import 'package:jellybook/variables.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 class DownloadScreen extends StatefulWidget {
-  Entry entry;
-  DownloadScreen({
+  final Entry entry;
+  const DownloadScreen({
+    super.key, 
     required this.entry,
   });
 
   @override
-  _DownloadScreenState createState() => _DownloadScreenState(
+  DownloadScreenState createState() => DownloadScreenState(
         entry: entry,
       );
 }
 
-class _DownloadScreenState extends State<DownloadScreen> {
+class DownloadScreenState extends State<DownloadScreen> {
   // final String comicId;
   Entry entry;
   bool forceDownload = false;
 
-  _DownloadScreenState({
+  DownloadScreenState({
     required this.entry,
     this.forceDownload = false,
   });

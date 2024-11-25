@@ -3,9 +3,7 @@
 
 // import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:isar/isar.dart';
-import 'package:isar_flutter_libs/isar_flutter_libs.dart';
 import 'package:jellybook/models/entry.dart';
 
 // reading screens
@@ -24,19 +22,21 @@ class ReadingScreen extends StatefulWidget {
   final String title;
   final String comicId;
 
-  ReadingScreen({
+  const ReadingScreen({
+    super.key,
     required this.title,
     required this.comicId,
   });
 
-  _ReadingScreenState createState() => _ReadingScreenState(
+  @override
+  ReadingScreenState createState() => ReadingScreenState(
         title: title,
         comicId: comicId,
       );
 }
 
 // make class not need to have a build method
-class _ReadingScreenState extends State<ReadingScreen> {
+class ReadingScreenState extends State<ReadingScreen> {
   final String title;
   final String comicId;
 
@@ -51,7 +51,7 @@ class _ReadingScreenState extends State<ReadingScreen> {
   final isar = Isar.getInstance();
   // var isar = Isar.open([EntrySchema], inspector: true);
 
-  _ReadingScreenState({
+  ReadingScreenState({
     required this.title,
     required this.comicId,
   });
@@ -302,7 +302,7 @@ class _ReadingScreenState extends State<ReadingScreen> {
       ),
       body: Center(
         child: Text(AppLocalizations.of(context)!.loadingComic,
-            style: TextStyle(fontSize: 20)),
+            style: const TextStyle(fontSize: 20)),
       ),
     );
   }

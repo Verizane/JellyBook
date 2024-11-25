@@ -4,24 +4,22 @@ import 'package:flutter/material.dart';
 // import 'package:jellybook/screens/collectionScreen.dart';
 import 'package:jellybook/screens/infoScreen.dart';
 import 'package:isar/isar.dart';
-import 'package:isar_flutter_libs/isar_flutter_libs.dart';
 import 'package:jellybook/models/entry.dart';
 import 'package:jellybook/widgets/roundedImageWithShadow.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 // import 'package:jellybook/providers/fixRichText.dart';
 import 'package:flutter_star/flutter_star.dart';
-import 'package:fancy_shimmer_image/fancy_shimmer_image.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:jellybook/variables.dart';
 
 class ContinueReadingScreen extends StatefulWidget {
-  const ContinueReadingScreen();
+  const ContinueReadingScreen({super.key});
 
   @override
-  _ContinueReadingScreenState createState() => _ContinueReadingScreenState();
+  ContinueReadingScreenState createState() => ContinueReadingScreenState();
 }
 
-class _ContinueReadingScreenState extends State<ContinueReadingScreen> {
+class ContinueReadingScreenState extends State<ContinueReadingScreen> {
   var isar = Isar.getInstance();
 
   // get all the entries that have been started but not finished

@@ -3,10 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:jellybook/themes/themeManager.dart';
 import 'package:logger/logger.dart';
-import 'package:provider/provider.dart';
 
 // get the ApplicationDocumentsDirectory path
 
@@ -17,10 +14,10 @@ Logger logger = Logger(
   output: kDebugMode
       ? ConsoleOutput()
       : FileOutput(
-          file: File(localPath + "/jellybook.log"),
+          file: File("$localPath/jellybook.log"),
           overrideExisting: false,
           encoding: utf8,
-          sink: IOSink(File(localPath + "/jellybook.log")
+          sink: IOSink(File("$localPath/jellybook.log")
               .openWrite(mode: FileMode.writeOnlyAppend, encoding: utf8)),
         ),
   level: Level.debug,

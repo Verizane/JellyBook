@@ -1,16 +1,12 @@
 // the purpose of this file is to allow you to edit a entry in your library
 
-import 'dart:convert';
-
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_star/flutter_star.dart';
 import 'package:intl/intl.dart';
 import 'package:jellybook/providers/fixRichText.dart';
-import 'package:jellybook/widgets/ToggleEditPreviewButton.dart';
 import 'package:jellybook/widgets/roundedImageWithShadow.dart';
-import 'package:jellybook/providers/updateLike.dart';
 import 'package:isar/isar.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:markdown/markdown.dart' as md;
@@ -29,28 +25,28 @@ import 'package:path/path.dart' as p;
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 class EditScreen extends StatefulWidget {
-  bool offline;
-  Entry entry;
+  final bool offline;
+  final Entry entry;
 
-  EditScreen({
+  const EditScreen({
     super.key,
     required this.entry,
     this.offline = false,
   });
 
   @override
-  _EditScreenState createState() => _EditScreenState(
+  EditScreenState createState() => EditScreenState(
         entry: entry,
         offline: offline,
       );
 }
 
-class _EditScreenState extends State<EditScreen> {
+class EditScreenState extends State<EditScreen> {
   bool editMode = true;
   bool offline;
   bool changed = false;
   Entry entry;
-  _EditScreenState({
+  EditScreenState({
     required this.entry,
     this.offline = false,
   });
@@ -271,6 +267,7 @@ class _EditScreenState extends State<EditScreen> {
         'Content-Length': '${file.length}',
       };
       try {
+        // TODO: response is unused. Probably want to overwrite the old image?
         final response = await api2.setItemImage(
           itemId: entry.id,
           imageType: ImageType.primary,

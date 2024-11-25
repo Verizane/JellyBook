@@ -2,13 +2,10 @@
 import 'package:flutter/material.dart';
 import 'package:jellybook/providers/login.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:jellybook/providers/themeProvider.dart';
 import 'package:jellybook/screens/homeScreen.dart';
 import 'package:jellybook/screens/offlineBookReader.dart';
-import 'package:jellybook/providers/languageProvider.dart';
 
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:jellybook/variables.dart';
 
@@ -17,22 +14,22 @@ class LoginScreen extends StatefulWidget {
   final String? url;
   final String? username;
   final String? password;
-  LoginScreen({this.url = "", this.username = "", this.password = ""});
+  const LoginScreen({super.key, this.url = "", this.username = "", this.password = ""});
 
   @override
-  _LoginScreenState createState() => _LoginScreenState(
+  LoginScreenState createState() => LoginScreenState(
         url: url,
         username: username,
         password: password,
       );
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class LoginScreenState extends State<LoginScreen> {
   // optional inputs of url, username, and password (use empty string if not provided)
   final String? url;
   final String? username;
   final String? password;
-  _LoginScreenState({
+  LoginScreenState({
     required this.url,
     required this.username,
     required this.password,
@@ -54,12 +51,12 @@ class _LoginScreenState extends State<LoginScreen> {
     // check_url();
     _passwordVisible = false;
     // check if url and username are provided
-    if (url != "" && url != null && username != "" && username != null) {
+    if (url != null && url != "" && username != null && username != "") {
       _loading = true;
-      logger.d("url: " + url!);
-      logger.d("username: " + username!);
+      logger.d("url: ${url!}");
+      logger.d("username: ${username!}");
       prefs?.setString("username", username!);
-      logger.d("password: " + password!);
+      logger.d("password: ${password!}");
       LoginProvider.loginStatic(
         url!,
         username!,
@@ -189,7 +186,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       _loading = true;
                     });
                     // logger.d("url: " + _url.text);
-                    logger.d("username: " + _username.text);
+                    logger.d("username: ${_username.text}");
                     // logger.d("password: " + _password.text);
                     LoginProvider.loginStatic(
                       _url.text,
@@ -201,7 +198,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => HomeScreen(),
+                            builder: (context) => const HomeScreen(),
                           ),
                         );
                       } else {
@@ -248,15 +245,15 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.cloud_off_outlined),
-                      SizedBox(
+                      const Icon(Icons.cloud_off_outlined),
+                      const SizedBox(
                         width: 10,
                       ),
                       Text(
                           AppLocalizations.of(context)
                                   ?.pageLoginOfflineReader ??
                               "Offline Reader",
-                          style: TextStyle(fontSize: 20)),
+                          style: const TextStyle(fontSize: 20)),
                     ],
                   ),
                 ),

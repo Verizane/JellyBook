@@ -1,27 +1,25 @@
 // The purpose of this screen is to allow the user to search for a specific book/comic
-import 'dart:ffi';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:isar/isar.dart';
-import 'package:isar_flutter_libs/isar_flutter_libs.dart';
 import 'package:jellybook/models/entry.dart';
 import 'package:jellybook/providers/fixRichText.dart';
 import 'package:jellybook/screens/infoScreen.dart';
-import 'package:fancy_shimmer_image/fancy_shimmer_image.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:string_similarity/string_similarity.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:jellybook/variables.dart';
 import 'package:jellybook/widgets/roundedImageWithShadow.dart';
 
 class SearchScreen extends StatefulWidget {
+  const SearchScreen({super.key});
+
   @override
-  _SearchScreenState createState() => _SearchScreenState();
+  SearchScreenState createState() => SearchScreenState();
 }
 
 // _SearchScreenState
-class _SearchScreenState extends State<SearchScreen> {
+class SearchScreenState extends State<SearchScreen> {
   final _searchController = TextEditingController();
   final isar = Isar.getInstance();
 

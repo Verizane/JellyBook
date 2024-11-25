@@ -24,26 +24,26 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:jellybook/providers/Author.dart';
 
 class InfoScreen extends StatefulWidget {
-  bool offline;
-  Entry entry;
+  final bool offline;
+  final Entry entry;
 
-  InfoScreen({
+  const InfoScreen({
     super.key,
     required this.entry,
     this.offline = false,
   });
 
   @override
-  _InfoScreenState createState() => _InfoScreenState(
+  InfoScreenState createState() => InfoScreenState(
         entry: entry,
         offline: offline,
       );
 }
 
-class _InfoScreenState extends State<InfoScreen> {
+class InfoScreenState extends State<InfoScreen> {
   bool offline;
   Entry entry;
-  _InfoScreenState({
+  InfoScreenState({
     required this.entry,
     this.offline = false,
   });

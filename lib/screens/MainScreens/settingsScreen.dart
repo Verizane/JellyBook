@@ -19,11 +19,13 @@ import 'package:sentry/sentry.dart';
 import 'package:tentacle/tentacle.dart';
 
 class SettingsScreen extends StatefulWidget {
+  const SettingsScreen({super.key});
+
   @override
-  _SettingsScreenState createState() => _SettingsScreenState();
+  SettingsScreenState createState() => SettingsScreenState();
 }
 
-class _SettingsScreenState extends State<SettingsScreen> {
+class SettingsScreenState extends State<SettingsScreen> {
   String userName = '';
   String serverUrl = '';
   Color textColor = Colors.black;
@@ -212,7 +214,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 },
                 child: Text(
                   AppLocalizations.of(context)?.licenses ?? 'Licenses',
-                  style: TextStyle(fontSize: 20),
+                  style: const TextStyle(fontSize: 20),
                 ),
               ),
             ),
@@ -297,9 +299,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final token = prefs.getString('accessToken') ?? '';
     final username = prefs.getString('username') ?? '';
     final version = packageInfo.version;
-    const _client = "JellyBook";
-    const _device = "Unknown Device";
-    const _deviceId = "Unknown Device id";
+    const client = "JellyBook";
+    const device = "Unknown Device";
+    const deviceId = "Unknown Device id";
 
     userName = username;
     serverUrl = server;
@@ -310,7 +312,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       'Accept-Encoding': 'gzip, deflate',
       'Content-Type': 'application/json',
       "X-Emby-Authorization":
-          "MediaBrowser Client=\"$_client\", Device=\"$_device\", DeviceId=\"$_deviceId\", Version=\"$version\", Token=\"$token\"",
+          "MediaBrowser Client=\"$client\", Device=\"$device\", DeviceId=\"$deviceId\", Version=\"$version\", Token=\"$token\"",
       'Connection': 'keep-alive',
       'Origin': server,
       'Host': server.substring(server.indexOf("//") + 2, server.length),
@@ -728,8 +730,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     SharedPreferences prefs =
                         await SharedPreferences.getInstance();
                     bool useSentry = prefs.getBool('useSentry') ?? false;
-                    if (useSentry)
+                    if (useSentry) {
                       await Sentry.captureException(e, stackTrace: s);
+                    }
                   }
                 },
               ),

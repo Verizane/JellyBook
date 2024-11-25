@@ -1,17 +1,10 @@
 // The purpose of this file is to allow the user to read pdf files
 
-import 'dart:io';
-import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:jellybook/screens/downloaderScreen.dart';
-import 'package:jellybook/providers/fileNameFromTitle.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:isar/isar.dart';
-import 'package:isar_flutter_libs/isar_flutter_libs.dart';
 import 'package:jellybook/models/entry.dart';
 import 'package:pdfx/pdfx.dart';
 import 'package:jellybook/providers/progress.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:jellybook/variables.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:jellybook/screens/AudioPicker.dart';
@@ -23,18 +16,19 @@ class PdfReader extends StatefulWidget {
   final String comicId;
   final String title;
 
-  PdfReader({
+  const PdfReader({super.key, 
     required this.comicId,
     required this.title,
   });
 
-  _PdfReaderState createState() => _PdfReaderState(
+  @override
+  PdfReaderState createState() => PdfReaderState(
         comicId: comicId,
         title: title,
       );
 }
 
-class _PdfReaderState extends State<PdfReader> {
+class PdfReaderState extends State<PdfReader> {
   final String comicId;
   final String title;
 
@@ -55,11 +49,11 @@ class _PdfReaderState extends State<PdfReader> {
   Duration audioPosition = Duration();
   String audioId = '';
   // pages
-  int _totalPages = 0;
+  final int _totalPages = 0;
   late PdfController pdfController;
   late String direction;
 
-  _PdfReaderState({
+  PdfReaderState({
     required this.comicId,
     required this.title,
   });
@@ -128,7 +122,7 @@ class _PdfReaderState extends State<PdfReader> {
                 automaticallyImplyLeading: false,
                 title: Text(title),
                 leading: IconButton(
-                  icon: Icon(Icons.arrow_back),
+                  icon: const Icon(Icons.arrow_back),
                   onPressed: () {
                     Navigator.of(context).pop();
                     Navigator.of(context).pop();
@@ -142,21 +136,19 @@ class _PdfReaderState extends State<PdfReader> {
                 ],
               ),
               body: Center(
-                child: Container(
-                  child: PdfView(
-                    scrollDirection: direction.toLowerCase() == 'vertical'
-                        ? Axis.vertical
-                        : Axis.horizontal,
-                    reverse: direction.toLowerCase() == 'rtl' ? true : false,
-                    controller: pdfController,
-                    onPageChanged: (page) {
-                      saveProgress(page: page, comicId: comicId);
-                    },
-                    onDocumentError: (error) {
-                      logger.e('error: $error');
-                    },
-                    pageSnapping: true,
-                  ),
+                child: PdfView(
+                  scrollDirection: direction.toLowerCase() == 'vertical'
+                      ? Axis.vertical
+                      : Axis.horizontal,
+                  reverse: direction.toLowerCase() == 'rtl' ? true : false,
+                  controller: pdfController,
+                  onPageChanged: (page) {
+                    saveProgress(page: page, comicId: comicId);
+                  },
+                  onDocumentError: (error) {
+                    logger.e('error: $error');
+                  },
+                  pageSnapping: true,
                 ),
               ),
             );

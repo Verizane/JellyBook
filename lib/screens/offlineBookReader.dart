@@ -1,43 +1,33 @@
 // The purpose of this screen is to allow the user to read the book offline
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter/foundation.dart';
 import 'package:jellybook/providers/fetchCategories.dart';
-import 'package:jellybook/providers/themeProvider.dart';
-import 'package:jellybook/screens/MainScreens/searchScreen.dart';
 import 'package:jellybook/screens/collectionScreen.dart';
 import 'package:jellybook/screens/loginScreen.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:fancy_shimmer_image/fancy_shimmer_image.dart';
 import 'package:jellybook/screens/infoScreen.dart';
 import 'package:isar/isar.dart';
-import 'package:isar_flutter_libs/isar_flutter_libs.dart';
-import 'package:jellybook/screens/offlineBookReader.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:jellybook/models/entry.dart';
-import 'package:jellybook/models/folder.dart';
 import 'package:jellybook/models/login.dart';
 import 'package:jellybook/main.dart';
 
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:jellybook/providers/languageProvider.dart';
 import 'package:jellybook/variables.dart';
 import 'package:jellybook/widgets/roundedImageWithShadow.dart';
 
 class OfflineBookReader extends StatefulWidget {
-  SharedPreferences prefs;
-  OfflineBookReader({Key? key, required this.prefs}) : super(key: key);
+  final SharedPreferences prefs;
+  
+  const OfflineBookReader({super.key, required this.prefs});
 
   @override
-  _OfflineBookReaderState createState() => _OfflineBookReaderState(prefs);
+  OfflineBookReaderState createState() => OfflineBookReaderState(prefs);
 }
 
-class _OfflineBookReaderState extends State<OfflineBookReader> {
+class OfflineBookReaderState extends State<OfflineBookReader> {
   SharedPreferences prefs;
-  _OfflineBookReaderState(this.prefs);
+  OfflineBookReaderState(this.prefs);
 
   @override
   void initState() {
@@ -131,11 +121,11 @@ class _OfflineBookReaderState extends State<OfflineBookReader> {
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Padding(
-                        padding: EdgeInsets.only(left: 10),
+                        padding: const EdgeInsets.only(left: 10),
                         child: Text(
                           AppLocalizations.of(context)?.collections ??
                               "Collections",
-                          style: TextStyle(
+                          style: const TextStyle(
                             // size is the size of a title
                             fontSize: 30,
                             // decoration: TextDecoration.underline,

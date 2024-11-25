@@ -17,7 +17,8 @@ class EpubReader extends StatefulWidget {
   final String title;
   final String comicId;
 
-  EpubReader({
+  const EpubReader({
+    super.key, 
     required this.title,
     required this.comicId,
   });
@@ -269,7 +270,7 @@ class EpubReaderState extends State<EpubReader> {
                 ),
                 actions: [
                   IconButton(
-                    icon: Icon(Icons.arrow_back),
+                    icon: const Icon(Icons.arrow_back),
                     onPressed: () {
                       Navigator.pop(context);
                       Navigator.pop(context);
@@ -299,7 +300,7 @@ class EpubReaderState extends State<EpubReader> {
                 onDocumentLoaded: (document) {
                   logger.d("Document loaded: ${document.Title}");
                   // wait 5 seconds and then go to the chapter
-                  Future.delayed(Duration(seconds: 5), () {
+                  Future.delayed(const Duration(seconds: 5), () {
                     logger.d("Document loaded: ${document.Title}");
                     goToChapter(_epubController);
                   });
@@ -315,7 +316,7 @@ class EpubReaderState extends State<EpubReader> {
               ),
             );
           } else {
-            return Scaffold(
+            return const Scaffold(
               body: Center(
                 child: CircularProgressIndicator(),
               ),

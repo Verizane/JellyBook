@@ -4,7 +4,6 @@
 import 'package:flutter/material.dart';
 import 'package:jellybook/models/login.dart';
 import 'package:isar/isar.dart';
-import 'package:isar_flutter_libs/isar_flutter_libs.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
@@ -23,11 +22,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/cupertino.dart';
 
 class HomeScreen extends StatefulWidget {
+
+  const HomeScreen({super.key});
+
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  HomeScreenState createState() => HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class HomeScreenState extends State<HomeScreen> {
   /*
            Heres what this should look like:
            - should be a grid view of cards
