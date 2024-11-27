@@ -5,10 +5,11 @@
 import 'package:flutter/material.dart';
 import 'package:isar/isar.dart';
 import 'package:jellybook/models/entry.dart';
+import 'package:jellybook/screens/readingScreens/cbrCbzReader.dart';
+import 'package:jellybook/screens/readingScreens/cbrCbzReaderWindows.dart';
 
 // reading screens
 import 'package:jellybook/screens/readingScreens/pdfReader.dart';
-import 'package:jellybook/screens/readingScreens/cbrCbzReader.dart';
 import 'package:jellybook/screens/readingScreens/epubReader.dart';
 import 'package:jellybook/screens/readingScreens/audiobookReader.dart';
 
@@ -29,16 +30,14 @@ class ReadingScreen extends StatefulWidget {
   });
 
   @override
-  ReadingScreenState createState() => ReadingScreenState(
-        title: title,
-        comicId: comicId,
-      );
+  ReadingScreenState createState() => ReadingScreenState();
 }
 
 // make class not need to have a build method
 class ReadingScreenState extends State<ReadingScreen> {
-  final String title;
-  final String comicId;
+  late String title;
+  late String comicId;
+  bool isWindows = false;
 
   List<String> chapters = [];
   String folderName = '';
@@ -51,11 +50,6 @@ class ReadingScreenState extends State<ReadingScreen> {
   final isar = Isar.getInstance();
   // var isar = Isar.open([EntrySchema], inspector: true);
 
-  ReadingScreenState({
-    required this.title,
-    required this.comicId,
-  });
-
   // first, we want to see if the user has given us permission to access their files
   // if they have, we want to check if the comic has been downloaded
   // if it has, we want to get the file extension to determine how to read it
@@ -63,6 +57,9 @@ class ReadingScreenState extends State<ReadingScreen> {
   @override
   void initState() {
     super.initState();
+    title = widget.title;
+    comicId = widget.comicId;
+
     checkPermission(comicId);
     readComic(comicId);
   }
@@ -182,18 +179,8 @@ class ReadingScreenState extends State<ReadingScreen> {
       case 'cbr':
       case 'zip':
       case 'rar':
-        Navigator.pushReplacement(
-          context,
-          // for the route, have no transition
-          PageRouteBuilder(
-            transitionDuration: const Duration(milliseconds: 0),
-            pageBuilder: (context, animation, secondaryAnimation) =>
-                CbrCbzReader(
-              comicId: comicId,
-              title: title,
-            ),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
+        bool isWindows = Theme.of(context).platform == TargetPlatform.windows;
+        SlideTransition genSlideTransition(BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) {
               var begin = const Offset(1.0, 0.0);
               var end = Offset.zero;
               var curve = Curves.ease;
@@ -205,7 +192,18 @@ class ReadingScreenState extends State<ReadingScreen> {
                 position: animation.drive(tween),
                 child: child,
               );
-            },
+        }
+
+        Navigator.pushReplacement(
+          context,
+          PageRouteBuilder(
+            transitionDuration: const Duration(milliseconds: 0),
+            pageBuilder: (context, animation, secondaryAnimation) =>
+              isWindows ?
+                CbrCbzReaderWindows(comicId: comicId, title: title, isWindows: isWindows)
+                : CbrCbzReader(title: title, comicId: comicId)
+            ,
+            transitionsBuilder: genSlideTransition
           ),
         );
         break;

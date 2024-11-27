@@ -61,7 +61,7 @@ class ContinueReadingScreenState extends State<ContinueReadingScreen> {
               child: Text(
                 AppLocalizations.of(context)?.continueReading ??
                     "Continue Reading",
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 30,
                   fontWeight: FontWeight.bold,
                 ),

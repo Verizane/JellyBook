@@ -3,6 +3,7 @@
 import 'dart:io';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:jellybook/providers/updatePagenum.dart';
 import 'package:isar/isar.dart';
 import 'package:jellybook/models/entry.dart';
@@ -16,21 +17,24 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 // cbr/cbz reader
-class CbrCbzReader extends StatefulWidget {
+class CbrCbzReaderWindows extends StatefulWidget {
+
   final String title;
   final String comicId;
+  final bool isWindows;
 
-  const CbrCbzReader({
+  const CbrCbzReaderWindows({
     super.key,
     required this.title,
     required this.comicId,
+    required this.isWindows
   });
 
   @override
-  CbrCbzReaderState createState() => CbrCbzReaderState();
+  CbrCbzReaderWindowsState createState() => CbrCbzReaderWindowsState();
 }
 
-class CbrCbzReaderState extends State<CbrCbzReader> {
+class CbrCbzReaderWindowsState extends State<CbrCbzReaderWindows> {
   late String title;
   late String comicId;
   int pageNum = 0;
@@ -40,6 +44,7 @@ class CbrCbzReaderState extends State<CbrCbzReader> {
   late List<String> chapters = [];
   late List<String> pages = [];
   late String direction;
+  ZoomFactor zoomFactor = ZoomFactor();
 
   // audio variables
   String audioPath = '';
@@ -58,7 +63,7 @@ class CbrCbzReaderState extends State<CbrCbzReader> {
     // create a list of chapters
     // call getChaptersFromDirectory with path as a FileSystemEntity
     await getChaptersFromDirectory(Directory(path));
-    logger.d("chapters: $chapters");
+    logger.d("chapters: ${chapters.length}");
     List<String> formats = [
       ".jpg",
       ".jpeg",
@@ -80,10 +85,13 @@ class CbrCbzReaderState extends State<CbrCbzReader> {
       }
     }
     pageFiles.sort();
+    // reset pages to empty them and not concatenate
+    pages = [];
     for (var page in pageFiles) {
       pages.add(page);
       pageNums++;
     }
+    logger.d("pages: ${pages.length}");
   }
 
   Future<void> getData() async {
@@ -185,8 +193,8 @@ class CbrCbzReaderState extends State<CbrCbzReader> {
     ];
 
     // Check if the directory ends with any of the file types
-    if (fileTypes
-        .any((fileType) => directory.path.toLowerCase().endsWith(fileType))) {
+    if (fileTypes.any((fileType) => directory.path
+          .toLowerCase().endsWith(fileType))) {
       // If it does, add the parent directory to the chapters list if it's not already there
       if (!chapters.contains(directory.parent.path)) {
         chapters.add(directory.parent.path);
@@ -302,9 +310,35 @@ class CbrCbzReaderState extends State<CbrCbzReader> {
       onAudioPickerPressed: onAudioPickerPressed,
     );
   }
+  // this is like a lock that prevent update the PageView multiple times while is 
+  // scrolling
+  bool pageIsScrolling = false;
+  
+  void _onZoomScroll(double offset) {
+    if (offset > 0) {
+      zoomFactor.zoomOut();
+    } else {
+      zoomFactor.zoomIn();
+    }
+    setState(() {
+      transformationController.value = Matrix4.identity()..scale(zoomFactor.zoomFactor);
+    });
+  }
+
+  TransformationController transformationController = TransformationController();
+  double scale = 1.0;
+  bool isPanEnabled = false;
 
   @override
   Widget build(BuildContext context) {
+    transformationController.value = (Matrix4.identity()..scale(scale));
+    // Dynamically fetch window size
+    double windowWidth = MediaQuery.of(context).size.width;
+    double windowHeight = MediaQuery.of(context).size.height;
+
+    // Print the dynamic values for debugging
+    logger.d('Window size: $windowWidth x $windowHeight');
+
     return FutureBuilder(
       future: getChapters(),
       builder: (BuildContext context, AsyncSnapshot snapshot) {
@@ -335,68 +369,139 @@ class CbrCbzReaderState extends State<CbrCbzReader> {
                     future: createPageList(),
                     builder: (BuildContext context, AsyncSnapshot snapshot) {
                       if (snapshot.connectionState == ConnectionState.done) {
-                        return Column(
-                          children: [
-                            Expanded(
-                              child: direction.toLowerCase() == 'vertical'
-                                  ? InteractiveViewer(
-                                      child: SingleChildScrollView(
-                                        child: Column(
-                                          children: [
-                                            for (var page in pages)
-                                              Image.file(
-                                                File(page),
-                                                fit: BoxFit.fitHeight,
-                                              ),
-                                          ],
-                                        ),
-                                      ),
-                                    )
-                                  : PageView.builder(
-                                      scrollDirection: Axis.horizontal,
-                                      reverse: direction == 'rtl',
-                                      // scrollDirection: Axis.vertical,
-                                      itemCount: pages.length,
-                                      controller: PageController(
-                                        initialPage: pageNum,
-                                      ),
-                                      itemBuilder: (context, index) {
-                                        return InteractiveViewer(
-                                          child: Image.file(
-                                            File(pages[index]),
-                                            fit: BoxFit.contain,
-                                          ),
-                                        );
-                                      },
-                                      onPageChanged: (index) {
-                                        saveProgress(index);
-                                        progress = index / pageNums;
-                                      },
-                                    ),
-                            ),
-                          ],
-                        );
+                        return       
+                            CustomInteractiveViewer(imageFileStrings: pages
+                            );
                       } else {
                         return const Center(
                           child: CircularProgressIndicator(),
                         );
                       }
-                    },
+                    }
                   );
                 } else {
                   return const Center(
                     child: CircularProgressIndicator(),
                   );
                 }
-              },
-            ),
+              }
+            )
           );
         } else {
           return const Center(
             child: CircularProgressIndicator(),
           );
         }
-      },
+      }
+    );
+  }
+}
+
+class ZoomFactor {
+  double zoomFactor = 1.0; // Initial zoom (1.0 = 100%)
+  final double minZoomFactor = 0.3; // Minimum zoom (30%)
+  final double maxZoomFactor = 3.0; // Maximum zoom (300%)
+
+  void zoomIn() {
+    zoomFactor = (zoomFactor - 0.1).clamp(minZoomFactor, maxZoomFactor);
+  }
+
+  void zoomOut() {
+    zoomFactor = (zoomFactor + 0.1).clamp(minZoomFactor, maxZoomFactor);
+  }
+}
+
+
+
+class CustomInteractiveViewer extends StatefulWidget {
+  final List<String> imageFileStrings;
+  const CustomInteractiveViewer({super.key, required this.imageFileStrings});
+
+  @override
+  CustomInteractiveViewerState createState() => CustomInteractiveViewerState();
+}
+
+class CustomInteractiveViewerState extends State<CustomInteractiveViewer> {
+  late List<String> imageFileStrings;
+
+  final TransformationController _transformationController = TransformationController();
+  bool _isControlPressed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    imageFileStrings = widget.imageFileStrings;
+    logger.d("imageFileStrings: ${imageFileStrings.length}");
+  }
+
+  @override
+  void dispose() {
+    _transformationController.dispose();
+    super.dispose();
+  }
+  
+  void _handlePointerSignal(PointerSignalEvent event) {
+    if (event is PointerScrollEvent) {
+      if (_isControlPressed) {
+        // Handle zoom
+        final scaleChange = event.scrollDelta.dy < 0 ? 1.1 : 0.9;
+        _transformationController.value = _transformationController.value.scaled(scaleChange);
+      } else {
+        // Handle scroll
+        final double offsetChange = event.scrollDelta.dy < 0 ? 10.0 : -10.0;
+        _transformationController.value = _transformationController.value.absolute()
+          ..translate(0.0, -offsetChange);
+      }
+    }
+  }
+
+  KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event) {
+    if (event is KeyDownEvent) {
+      if (event.logicalKey == LogicalKeyboardKey.controlLeft ||
+          event.logicalKey == LogicalKeyboardKey.controlRight) {
+        setState(() {
+          _isControlPressed = true;
+        });
+      }
+    } else if (event is KeyUpEvent) {
+      if (event.logicalKey == LogicalKeyboardKey.controlLeft ||
+          event.logicalKey == LogicalKeyboardKey.controlRight) {
+        setState(() {
+          _isControlPressed = false;
+        });
+      }
+    }
+
+    return KeyEventResult.ignored;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Dynamically fetch window size
+    double windowWidth = MediaQuery.of(context).size.width;
+    double windowHeight = MediaQuery.of(context).size.height;
+    return Focus(
+      autofocus: true,
+      onKeyEvent: _handleKeyEvent,
+      child: Listener(
+        onPointerSignal: _handlePointerSignal,
+        child: SingleChildScrollView(
+          child: Center(
+            child: Column(
+              children: 
+              [
+                for (var imageFile in imageFileStrings)
+                Image.file(
+                  File(imageFile),
+                  width: windowWidth,
+                  height: windowHeight,
+                  fit: BoxFit.fitHeight,
+                ),
+              ],
+            ),
+          )
+        ),
+      )
     );
   }
 }

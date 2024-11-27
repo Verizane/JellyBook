@@ -200,14 +200,14 @@ class _collectionScreenState extends State<collectionScreen> {
                   Text(
                     AppLocalizations.of(context)?.noResultsFound ??
                         'No results found in this folder',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 25,
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
-                  Icon(Icons.sentiment_dissatisfied, size: 100),
+                  const Icon(Icons.sentiment_dissatisfied, size: 100),
                 ],
               ),
             );
@@ -219,11 +219,11 @@ class _collectionScreenState extends State<collectionScreen> {
                   Text(
                     AppLocalizations.of(context)?.unknownError ??
                         "An unknown error has occured.",
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 25,
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
                   Icon(Icons.sentiment_dissatisfied, size: 100),

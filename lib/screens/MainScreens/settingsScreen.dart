@@ -327,7 +327,7 @@ class SettingsScreenState extends State<SettingsScreen> {
         headers: headers,
       );
       logger.i(response.statusCode);
-      if (response != null && response.statusCode == 200) {
+      if (response.statusCode == 200) {
         image = response.data!;
       }
     } catch (e, s) {
